@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý người dùng (RBAC) — PetCompanion</title>
+<link rel="stylesheet" href="../core/base.css"><link rel="stylesheet" href="rbac.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+</head>
+<body>
+<header class="topnav">
+  <a class="brand" href="../index.html" style="text-decoration:none;color:inherit"><img class="brand-logo" src="../assets/logoPet-trim.png" alt="PetCompanion"></a>
+  <span class="admin-pill">Quản trị viên<br>(Admin)</span>
+  <nav class="nav-links">
+    <a class="nav-link" href="dashboard.html">Tổng quan (Dashboard)</a>
+    <a class="nav-link active" href="rbac.html">Quản lý người dùng (RBAC)</a>
+    <a class="nav-link" href="services.html">Quản lý dịch vụ (Services)</a>
+    <a class="nav-link" href="#">Cài đặt hệ thống</a>
+  </nav>
+  <label class="nav-search"><span class="material-symbols-outlined">search</span><input placeholder="Tìm kiếm hệ thống..."></label>
+  <button class="nav-bell"><span class="material-symbols-outlined">notifications</span><span class="dot"></span></button>
+  <div class="nav-user"><b>SuperAdmin Hoàng Nam</b><span>Hệ thống máy chủ</span></div>
+</header>
+
+<div class="wrap">
+  <div class="page-head">
+    <div>
+      <span class="head-badge"><span class="material-symbols-outlined">shield</span>Trung tâm quản trị RBAC</span>
+      <h1>Quản lý Người dùng &amp; Phân quyền RBAC</h1>
+      <p class="page-sub">Quản trị danh sách tài khoản Chủ nuôi, Bác sĩ thú y, Đối tác cơ sở và Huấn luyện viên trên toàn hệ sinh thái CSE122.</p>
+    </div>
+  </div>
+
+  <section class="stats">
+    <div class="scard astat" style="--ac:#0d9488"><div class="astat-label">Tổng tài khoản</div><div class="astat-row"><b>1,420</b><span class="tpill tpill-mint">+14.2%</span></div></div>
+    <div class="scard astat" style="--ac:#14b8a6"><div class="astat-label">Bác sĩ &amp; Cơ sở Spa</div><div class="astat-row"><b>184</b><span class="tpill tpill-mint">+8 đối tác</span></div></div>
+    <div class="scard astat" style="--ac:#f59e0b"><div class="astat-label">Chờ xác thực 2FA</div><div class="astat-row"><b>29</b><span class="tpill tpill-amber">Cần duyệt</span></div></div>
+    <div class="scard astat" style="--ac:#f43f5e"><div class="astat-label">Tạm khóa / Cảnh báo</div><div class="astat-row"><b>12</b><span class="tpill tpill-rose">-3 vi phạm</span></div></div>
+  </section>
+
+  <!-- Filter bar -->
+  <section class="fbar">
+    <label class="f-search"><span class="material-symbols-outlined">search</span><input id="uSearch" placeholder="Tìm kiếm theo họ tên, email, số điện thoại..."></label>
+    <select class="f-select" id="uRole"><option value="all">Tất cả vai trò</option><option value="chu-nuoi">Chủ nuôi (Pet Owner)</option><option value="bac-si">Bác sĩ / Đối tác Y tế</option><option value="hlv">Huấn luyện viên (K9 Trainer)</option><option value="spa">Đối tác Spa / Groomer</option></select>
+    <select class="f-select" id="uStatus"><option value="all">Tất cả trạng thái</option><option value="active">Đang hoạt động</option><option value="pending">Chờ kích hoạt</option><option value="locked">Đang khóa</option></select>
+    <button class="btn btn-outline" id="btnCsv"><span class="material-symbols-outlined">ios_share</span>Xuất danh sách (CSV/JSON)</button>
+    <button class="btn btn-primary" data-open="modalAdd"><span class="material-symbols-outlined">person_add</span>+ Thêm người dùng mới</button>
+  </section>
+
+  <!-- Table -->
+  <section class="card" style="border-radius:20px">
+    <div class="tscroll">
+    <table>
+      <thead><tr><th>Người dùng</th><th>Vai trò</th><th>Thông tin liên hệ</th><th>Số thú cưng / Chi nhánh</th><th>Ngày tham gia &amp; Lần cuối</th><th>Trạng thái tài khoản</th><th style="text-align:right">Thao tác CRUD</th></tr></thead>
+      <tbody id="uBody"></tbody>
+    </table>
+    </div>
+    <div class="table-foot"><span id="uCount">Đang tải tài khoản...</span>
+      <div class="pager"><button class="pg" disabled><span class="material-symbols-outlined" style="font-size:18px">chevron_left</span></button><button class="pg on">1</button><button class="pg">2</button><button class="pg">3</button><span class="pg-dots">...</span><button class="pg">120</button><button class="pg"><span class="material-symbols-outlined" style="font-size:18px">chevron_right</span></button></div>
+    </div>
+  </section>
+
+  <!-- Policy banner -->
+  <section class="policy">
+    <div class="policy-left">
+      <span class="policy-ic"><span class="material-symbols-outlined">verified_user</span></span>
+      <div><h4>Chính sách bảo mật quyền hạn &amp; Kiểm toán 2FA</h4><p>Mọi thao tác cấp quyền Administrator hoặc Bác sĩ thú y đều được lưu vết trong Nhật ký kiểm toán (Audit Trail) và yêu cầu chữ ký số phê duyệt.</p></div>
+    </div>
+    <button class="btn btn-white" data-open="modalPolicy"><span class="material-symbols-outlined">policy</span>Xem Chính sách RBAC</button>
+  </section>
+</div>
+
+<footer class="sys-footer"><span class="live"><i></i>Hệ thống vận hành bình thường (99.98% Uptime)</span><span>© 2025 PetCompanion Admin Portal. Tất cả các quyền được bảo lưu.</span></footer>
+
+<!-- Modal Thêm người dùng -->
+<div class="modal-ov" id="modalAdd">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title"><span class="material-symbols-outlined">person_add</span>Thêm người dùng mới</div><button class="modal-x" data-close="modalAdd"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="modal-body">
+      <div class="f-group"><label class="f-label">Họ và tên</label><input class="f-input" id="aName" placeholder="VD: Phạm Thu Trang"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="aEmail" placeholder="email@domain.vn"></div>
+        <div class="f-group"><label class="f-label">SĐT</label><input class="f-input" id="aPhone" placeholder="0912 345 678"></div>
+      </div>
+      <div class="f-group" style="margin:0"><label class="f-label">Vai trò</label><select class="f-input" id="aRole"><option value="chu-nuoi">Chủ nuôi (Pet Owner)</option><option value="bac-si">Bác sĩ / Đối tác Y tế</option><option value="hlv">Huấn luyện viên (K9 Trainer)</option><option value="spa">Đối tác Spa / Groomer</option></select></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-outline" data-close="modalAdd">Hủy bỏ</button><button class="btn btn-primary" id="btnSaveUser"><span class="material-symbols-outlined">person_add</span>Tạo tài khoản</button></div>
+  </div>
+</div>
+<!-- Modal Chi tiết -->
+<div class="modal-ov" id="modalView">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title"><span class="material-symbols-outlined">badge</span>Chi tiết tài khoản</div><button class="modal-x" data-close="modalView"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="modal-body" id="viewBody"></div>
+    <div class="modal-foot"><button class="btn btn-outline" data-close="modalView">Đóng cửa sổ</button></div>
+  </div>
+</div>
+<!-- Modal Chính sách -->
+<div class="modal-ov" id="modalPolicy">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title"><span class="material-symbols-outlined">policy</span>Chính sách RBAC &amp; Kiểm toán 2FA</div><button class="modal-x" data-close="modalPolicy"><span class="material-symbols-outlined">close</span></button></div>
+    <div class="modal-body">
+      <div class="pol-item"><span class="material-symbols-outlined">security</span><div><b>Phân quyền theo vai trò (RBAC):</b> Mỗi tài khoản được gán một vai trò duy nhất với tập quyền hạn định nghĩa sẵn, không cấp quyền chéo giữa các module.</div></div>
+      <div class="pol-item"><span class="material-symbols-outlined">gpp_good</span><div><b>Xác thực 2 lớp (2FA):</b> Bắt buộc với tài khoản Bác sĩ thú y và Quản trị viên. Mã OTP hiệu lực 60 giây.</div></div>
+      <div class="pol-item"><span class="material-symbols-outlined">history</span><div><b>Nhật ký kiểm toán (Audit Trail):</b> Mọi thao tác cấp quyền, khóa, xóa được lưu vết 5 năm và yêu cầu chữ ký số phê duyệt.</div></div>
+      <div class="pol-item" style="border:0"><span class="material-symbols-outlined">lock</span><div><b>Khóa tự động:</b> Tài khoản không hoạt động 90 ngày sẽ bị khóa tạm thời và yêu cầu xác minh lại danh tính.</div></div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-primary" data-close="modalPolicy">Đã hiểu</button></div>
+  </div>
+</div>
+
+<script src="../core/base.js"></script><script src="../core/api.js"></script><script src="rbac.js"></script>
+</body>
+</html>
